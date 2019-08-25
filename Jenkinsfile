@@ -5,8 +5,13 @@ node {
     try{
         def mvnHome
         stage('User Input Section'){
-            input id: 'UserInput', message: 'Waiting for user input', parameters: [choice(choices: ['Yes', 'No'], description: '', name: 'DeployApplication')]
-            echo "User Input is ${UserInput}"
+            def userInput = input(
+                    id: 'UserInput',
+                    message: 'Waiting for user input',
+                    parameters: [choice(choices: ['Yes', 'No'],
+                                        description: 'Do you want to deploy application?',
+                                        name: 'DeployApplication')])
+            echo "User Input is ${userInput}"
         }
         stage('Checkout Stage') {
             echo "Checking out code from SCM for env.BRANCH_NAME"
