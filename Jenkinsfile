@@ -5,7 +5,7 @@ node {
     try{
         def mvnHome
         stage('Checkout Stage') {
-            echo "Checking out code from SCM for ${branch}"
+            echo "Checking out code from SCM for env.BRANCH_NAME"
             checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Sangopak/cicd.git']]])
             mvnHome = tool 'Maven'
         }
@@ -39,8 +39,8 @@ node {
 
 def notify(status){
     try{
-        echo "Pipeline Status for ${branch} with ${buildNumber} and URL as ${buildUrl} is ${status}"
-        mail bcc: '', body: "Pipeline Status for ${branch} with ${buildNumber} and URL as ${buildUrl} is ${status}", cc: '', from: '', replyTo: '', subject: "Pipeline Status -> ${status}", to: 'sangojumech07@gmail.com'
+        echo "Pipeline Status for env.BRANCH_NAME with env.BUILD_NUMBER and URL as env.BUILD_URL is ${status}"
+        mail bcc: '', body: "Pipeline Status for env.BRANCH_NAME with env.BUILD_NUMBER and URL as env.BUILD_URL is ${status}", cc: '', from: '', replyTo: '', subject: "Pipeline Status -> ${status}", to: 'sangojumech07@gmail.com'
     }catch (err){
         echo "Caught: ${err}"
     }
