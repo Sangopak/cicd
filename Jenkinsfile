@@ -24,7 +24,7 @@ node {
             withEnv(["MVN_HOME=$mvnHome"]) {
                 echo "Running build unit test and package for ${branch}"
                 if (isUnix()) {
-                    sh '"$MVN_HOME/bin/mvn" -Dmaven.test.failure.ignore clean package'
+                    sh '"$MVN_HOME/bin/mvn" clean package'
                 } else {
                     bat(/"%MVN_HOME%\bin\mvn" clean package/)
                 }
@@ -38,15 +38,22 @@ node {
             echo 'Archiving Artifacts for ${branch}'
             archiveArtifacts 'target/*.jar'
         }
-        echo 'All stages completed for ${branch}'
-        notify("Success")
-        currentBuild.result = 'Success'
         if(deployApplication.equalsIgnoreCase("Yes")){
             stage("Deploying Application"){
                 echo 'Deploying application in local'
-                bat label: '', script: 'java -jar target\\product-1.0-SNAPSHOT.jar'
+                withEnv(["MVN_HOME=$mvnHome"]) {
+                    echo "Running build unit test and package for ${branch}"
+                    if (isUnix()) {
+                        sh '"$MVN_HOME/bin/mvn" spring-boot:run'
+                    } else {
+                        bat(/"%MVN_HOME%\bin\mvn" spring-boot:run/)
+                    }
+                }
             }
         }
+        echo 'All stages completed for ${branch}'
+        notify("Success")
+        currentBuild.result = 'Success'
     }catch (err){
         echo "Caught: ${err}"
         notify("Failure")
