@@ -1,14 +1,17 @@
 node {
+    def branch = env.BRANCH_NAME
+    def buildNumber = env.BUILD_NUMBER
+    def buildUrl = env.BUILD_URL
     try{
         def mvnHome
         stage('Checkout Stage') {
-            echo "Checking out code from SCM for ${env.BRANCH_NAME}"
+            echo "Checking out code from SCM for ${branch}"
             checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Sangopak/cicd.git']]])
             mvnHome = tool 'Maven'
         }
         stage('Build Unit Test and Package') {
             withEnv(["MVN_HOME=$mvnHome"]) {
-                echo "Running build unit test and package for ${env.BRANCH_NAME}"
+                echo "Running build unit test and package for ${branch}"
                 if (isUnix()) {
                     sh '"$MVN_HOME/bin/mvn" -Dmaven.test.failure.ignore clean package'
                 } else {
@@ -17,25 +20,27 @@ node {
             }
         }
         stage('Collect Test Results') {
-            echo "Collecting Test results for ${env.BRANCH_NAME}"
+            echo "Collecting Test results for ${branch}"
             junit '**/target/surefire-reports/*.xml'
         }
         stage('Archive Artifacts') {
-            echo "Archiving Artifacts for ${env.BRANCH_NAME}"
+            echo 'Archiving Artifacts for ${branch}'
             archiveArtifacts 'target/*.jar'
         }
-        echo "All stages completed for ${env.BRANCH_NAME}"
-        notify(${currentBuild.result})
+        echo 'All stages completed for ${branch}'
+        notify("Success")
+        currentBuild.result = 'Success'
     }catch (err){
         echo "Caught: ${err}"
-        notify(${currentBuild.result})
+        notify("Failure")
+        currentBuild.result = 'Failure'
     }
 }
 
 def notify(status){
     try{
-        echo "Pipeline Status for ${env.BRANCH_NAME} with ${env.BUILD_NUMBER} and URL as ${env.BUILD_URL} is ${status}"
-        mail bcc: '', body: "Pipeline Status for ${env.BRANCH_NAME} with ${env.BUILD_NUMBER} and URL as ${env.BUILD_URL} is ${status}", cc: '', from: '', replyTo: '', subject: "Pipeline Status -> ${status}", to: 'sangojumech07@gmail.com'
+        echo "Pipeline Status for ${branch} with ${buildNumber} and URL as ${buildUrl} is ${status}"
+        mail bcc: '', body: "Pipeline Status for ${branch} with ${buildNumber} and URL as ${buildUrl} is ${status}", cc: '', from: '', replyTo: '', subject: "Pipeline Status -> ${status}", to: 'sangojumech07@gmail.com'
     }catch (err){
         echo "Caught: ${err}"
     }
