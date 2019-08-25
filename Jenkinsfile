@@ -24,6 +24,12 @@ node {
         archiveArtifacts 'target/*.jar'
     }
     stage('Pipeline Status Email Step'){
-        mail bcc: '', body: 'Pipeline Status -> Not sure if Pipeline ran successfully or now', cc: '', from: '', replyTo: '', subject: 'Pipeline Status', to: 'sangojumech07@gmail.com'
+        try{
+            mail bcc: '', body: 'Pipeline Status -> Not sure if Pipeline ran successfully or now', cc: '', from: '', replyTo: '', subject: 'Pipeline Status', to: 'sangojumech07@gmail.com'
+        }catch (err){
+            echo "Caught: ${err}"
+            currentBuild.result = 'FAILURE'
+        }
+
     }
 }
