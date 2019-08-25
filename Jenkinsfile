@@ -4,6 +4,10 @@ node {
     def buildUrl = env.BUILD_URL
     try{
         def mvnHome
+        stage('User Input Section'){
+            input id: 'UserInput', message: 'Waiting for user input', parameters: [choice(choices: ['Yes', 'No'], description: '', name: 'DeployApplication')], submitterParameter: 'deployApplicationIndicator'
+            echo "User Input is ${deployApplicationIndicator}"
+        }
         stage('Checkout Stage') {
             echo "Checking out code from SCM for env.BRANCH_NAME"
             checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Sangopak/cicd.git']]])
