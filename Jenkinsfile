@@ -2,6 +2,7 @@ node {
     def branch = env.BRANCH_NAME
     def buildNumber = env.BUILD_NUMBER
     def buildUrl = env.BUILD_URL
+    def deployApplication = 'No';
     try{
         def mvnHome
         stage('User Input Section'){
@@ -12,6 +13,7 @@ node {
                                         description: 'Do you want to deploy application?',
                                         name: 'Do you want to deploy application?')])
             echo "User Input is ${userInput}"
+            deployApplication = userInput;
         }
         stage('Checkout Stage') {
             echo "Checking out code from SCM for env.BRANCH_NAME"
@@ -39,6 +41,12 @@ node {
         echo 'All stages completed for ${branch}'
         notify("Success")
         currentBuild.result = 'Success'
+        if(deployApplication.equalsIgnoreCase("Yes")){
+            stage("Deploying Application"){
+                echo 'Deploying application in local'
+                bat label: '', script: 'java -jar target\\product-1.0-SNAPSHOT.jar'
+            }
+        }
     }catch (err){
         echo "Caught: ${err}"
         notify("Failure")
