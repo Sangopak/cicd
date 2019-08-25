@@ -27,6 +27,7 @@ node {
             echo 'Archiving Artifacts for ${branch}'
             archiveArtifacts 'target/*.jar'
         }
+        step([$class: 'JUnitResultArchiver', testResults: 'target\\surefire-reports\\TEST-*.xml'])
         echo 'All stages completed for ${branch}'
         notify("Success")
         currentBuild.result = 'Success'
