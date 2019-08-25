@@ -10,7 +10,7 @@ node {
                     message: 'Waiting for user input',
                     parameters: [choice(choices: ['Yes', 'No'],
                                         description: 'Do you want to deploy application?',
-                                        name: 'DeployApplication')])
+                                        name: 'Do you want to deploy application?')])
             echo "User Input is ${userInput}"
         }
         stage('Checkout Stage') {
