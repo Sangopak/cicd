@@ -23,7 +23,7 @@ node {
         echo 'Archiving Artifacts'
         archiveArtifacts 'target/*.jar'
     }
-/*    stage('Pipeline Status Email Step'){
+    stage('Pipeline Status Email Step'){
         mail bcc: '', body: 'Pipeline Status -> Not sure if Pipeline ran successfully or now', cc: '', from: '', replyTo: '', subject: 'Pipeline Status', to: 'sangojumech07@gmail.com'
-    }*/
+    }
 }
