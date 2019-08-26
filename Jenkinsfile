@@ -1,7 +1,7 @@
 node {
-    def branch = env.BRANCH_NAME
-    def buildNumber = env.BUILD_NUMBER
-    def buildUrl = env.BUILD_URL
+    def branch = ${env.BRANCH_NAME}
+    def buildNumber = ${env.BUILD_NUMBER}
+    def buildUrl = ${env.BUILD_URL}
     def deployApplication = 'No';
     try{
         def mvnHome
@@ -16,7 +16,7 @@ node {
             deployApplication = userInput;
         }
         stage('Checkout Stage') {
-            echo "Checking out code from SCM for env.BRANCH_NAME"
+            echo "Checking out code from SCM for ${env.BRANCH_NAME}"
             checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Sangopak/cicd.git']]])
             mvnHome = tool 'Maven'
         }
@@ -63,8 +63,8 @@ node {
 
 def notify(status){
     try{
-        echo "Pipeline Status for env.BRANCH_NAME with env.BUILD_NUMBER and URL as env.BUILD_URL is ${status}"
-        mail bcc: '', body: "Pipeline Status for env.BRANCH_NAME with env.BUILD_NUMBER and URL as env.BUILD_URL is ${status}", cc: '', from: '', replyTo: '', subject: "Pipeline Status -> ${status}", to: 'sangojumech07@gmail.com'
+        echo "Pipeline Status for ${env.BRANCH_NAME} with ${env.BUILD_NUMBER} and URL as ${env.BUILD_URL} is ${status}"
+        mail bcc: '', body: "Pipeline Status for ${env.BRANCH_NAME} with ${env.BUILD_NUMBER} and URL as ${env.BUILD_URL} is ${status}", cc: '', from: '', replyTo: '', subject: "Pipeline Status -> ${status}", to: 'sangojumech07@gmail.com'
     }catch (err){
         echo "Caught: ${err}"
     }
