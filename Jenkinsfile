@@ -1,7 +1,4 @@
 node {
-    def branch = ${env.BRANCH_NAME}
-    def buildNumber = ${env.BUILD_NUMBER}
-    def buildUrl = ${env.BUILD_URL}
     def deployApplication = 'No';
     try{
         def mvnHome
@@ -22,7 +19,7 @@ node {
         }
         stage('Build Unit Test and Package') {
             withEnv(["MVN_HOME=$mvnHome"]) {
-                echo "Running build unit test and package for ${branch}"
+                echo "Running build unit test and package for ${env.BRANCH_NAME}"
                 if (isUnix()) {
                     sh '"$MVN_HOME/bin/mvn" clean package'
                 } else {
@@ -31,18 +28,18 @@ node {
             }
         }
         stage('Collect Test Results') {
-            echo "Collecting Test results for ${branch}"
+            echo "Collecting Test results for ${env.BRANCH_NAME}"
             junit '**/target/surefire-reports/*.xml'
         }
         stage('Archive Artifacts') {
-            echo 'Archiving Artifacts for ${branch}'
+            echo 'Archiving Artifacts for ${env.BRANCH_NAME}'
             archiveArtifacts 'target/*.jar'
         }
         if(deployApplication.equalsIgnoreCase("Yes")){
             stage("Deploying Application"){
                 echo 'Deploying application in local'
                 withEnv(["MVN_HOME=$mvnHome"]) {
-                    echo "Running build unit test and package for ${branch}"
+                    echo "Running build unit test and package for ${env.BRANCH_NAME}"
                     if (isUnix()) {
                         sh '"$MVN_HOME/bin/mvn" spring-boot:run'
                     } else {
@@ -51,7 +48,7 @@ node {
                 }
             }
         }
-        echo 'All stages completed for ${branch}'
+        echo 'All stages completed for ${env.BRANCH_NAME}'
         notify("Success")
         currentBuild.result = 'Success'
     }catch (err){
